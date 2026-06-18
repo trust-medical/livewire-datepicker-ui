@@ -49,6 +49,22 @@ it('applies mode defaults and normalizes date boundaries', function () {
         ->and($config->minuteStep)->toBe(5);
 });
 
+it('applies month defaults and normalizes month boundaries', function () {
+    $config = $this->factory->create([
+        'mode' => 'month',
+        'value' => '2026-06',
+        'min' => '2026-01',
+        'max' => '2026-12-31', // a full date clamps to its month
+    ], factoryConfig(), $this->locale, 'dpM');
+
+    expect($config->mode->value)->toBe('month')
+        ->and($config->displayFormat)->toBe('Y-m')
+        ->and($config->valueFormat)->toBe('Y-m')
+        ->and($config->value)->toBe('2026-06')
+        ->and($config->min)->toBe('2026-01')
+        ->and($config->max)->toBe('2026-12');
+});
+
 it('uses the 12-hour display format when the hour cycle is 12', function () {
     $config = $this->factory->create([
         'mode' => 'datetime',

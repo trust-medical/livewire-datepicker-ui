@@ -118,5 +118,21 @@
     "value": { "year": 2026, "month": 6, "day": 18 },
     "formatted": "2026年6月18日",
     "parseable": true
+  },
+  {
+    "name": "iso month",
+    "mode": "month",
+    "format": "Y-m",
+    "value": { "year": 2026, "month": 6, "day": 1 },
+    "formatted": "2026-06",
+    "parseable": true
+  },
+  {
+    "name": "japanese year-month",
+    "mode": "month",
+    "format": "Y年n月",
+    "value": { "year": 2026, "month": 6, "day": 1 },
+    "formatted": "2026年6月",
+    "parseable": true
   }
 ]

@@ -1,5 +1,9 @@
 * text=auto eol=lf
 
+# The prebuilt /dist assets are committed and MUST stay in the distribution
+# archive (they are what `vendor:publish --tag=datepicker-assets` ships), so they
+# are deliberately left without an export-ignore entry below.
+
 # Exclude development-only paths from the Composer/Git distribution archive.
 /.devcontainer        export-ignore
 /.github              export-ignore

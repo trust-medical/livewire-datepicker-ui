@@ -30,6 +30,9 @@ final class PickerConfigFactory
     /** @var list<string> */
     private const TIME_CANDIDATES = ['H:i:s', 'H:i', 'h:i A', 'g:i a'];
 
+    /** @var list<string> */
+    private const MONTH_CANDIDATES = ['Y-m', 'Y/m', 'm/Y'];
+
     public function __construct(
         private readonly DateParser $parser = new DateParser,
         private readonly DateFormatter $formatter = new DateFormatter,
@@ -126,6 +129,7 @@ final class PickerConfigFactory
             PickerMode::Date => 'Y-m-d',
             PickerMode::Time => 'H:i',
             PickerMode::DateTime => 'Y-m-d H:i',
+            PickerMode::Month => 'Y-m',
         };
     }
 
@@ -135,6 +139,7 @@ final class PickerConfigFactory
             PickerMode::Date => 'Y-m-d',
             PickerMode::Time => 'H:i:s',
             PickerMode::DateTime => 'Y-m-d\TH:i:s',
+            PickerMode::Month => 'Y-m',
         };
     }
 
@@ -170,6 +175,17 @@ final class PickerConfigFactory
         }
 
         // 2. Mode-appropriate candidate formats.
+        if ($mode === PickerMode::Month) {
+            foreach (self::MONTH_CANDIDATES as $candidate) {
+                $parsed = $this->tryParse($trimmed, $candidate, PickerMode::Month, $locale);
+                if ($parsed instanceof DateValue) {
+                    $time = $isMax ? new TimeValue(23, 59, 59) : new TimeValue(0, 0, 0);
+
+                    return new DateTimeValue($parsed, $time);
+                }
+            }
+        }
+
         if ($mode->hasDate()) {
             foreach (self::DATE_CANDIDATES as $candidate) {
                 $parsed = $this->tryParse($trimmed, $candidate, PickerMode::Date, $locale);
@@ -205,7 +221,7 @@ final class PickerConfigFactory
     private function formatForMode(DateTimeValue $dateTime, PickerMode $mode, string $valueFormat, Locale $locale): string
     {
         $value = match ($mode) {
-            PickerMode::Date => $dateTime->date,
+            PickerMode::Date, PickerMode::Month => $dateTime->date,
             PickerMode::Time => $dateTime->time,
             PickerMode::DateTime => $dateTime,
         };

@@ -104,14 +104,18 @@ final class DateParser
         string $format,
     ): DateValue|TimeValue|DateTimeValue {
         try {
-            $date = $mode->hasDate() ? $this->buildDate($captures, $locale, $input, $format) : null;
+            // Month formats (e.g. "Y-m") carry no day token, so default the day to
+            // the 1st — a month value is represented as a DateValue on day 1.
+            $date = $mode->hasDate()
+                ? $this->buildDate($captures, $locale, $input, $format, defaultDay: $mode === PickerMode::Month)
+                : null;
             $time = $mode->hasTime() ? $this->buildTime($captures, $input, $format) : null;
         } catch (InvalidArgumentException) {
             throw InvalidDateFormatException::forInput($input, $format);
         }
 
         return match ($mode) {
-            PickerMode::Date => $date ?? throw InvalidDateFormatException::forInput($input, $format),
+            PickerMode::Date, PickerMode::Month => $date ?? throw InvalidDateFormatException::forInput($input, $format),
             PickerMode::Time => $time ?? throw InvalidDateFormatException::forInput($input, $format),
             PickerMode::DateTime => new DateTimeValue(
                 $date ?? throw InvalidDateFormatException::forInput($input, $format),
@@ -121,11 +125,11 @@ final class DateParser
     }
 
     /** @param array<string, string> $captures */
-    private function buildDate(array $captures, Locale $locale, string $input, string $format): DateValue
+    private function buildDate(array $captures, Locale $locale, string $input, string $format, bool $defaultDay = false): DateValue
     {
         $year = $this->resolveYear($captures);
         $month = $this->resolveMonth($captures, $locale);
-        $day = $this->resolveDay($captures);
+        $day = $this->resolveDay($captures) ?? ($defaultDay ? 1 : null);
 
         if ($year === null || $month === null || $day === null) {
             throw InvalidDateFormatException::forInput($input, $format);

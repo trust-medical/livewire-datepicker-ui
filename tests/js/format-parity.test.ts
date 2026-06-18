@@ -23,7 +23,7 @@ function fixtureValue(testCase: FixtureCase): PickerValue {
       ? null
       : { year: v.year as number, month: v.month as number, day: v.day as number }
   const time =
-    testCase.mode === 'date'
+    testCase.mode === 'date' || testCase.mode === 'month'
       ? null
       : { hour: v.hour as number, minute: v.minute as number, second: (v.second ?? 0) as number }
   return { date, time }

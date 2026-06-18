@@ -92,17 +92,21 @@ final class DisabledRuleFactory
         }
 
         // The normalized boundary is already a value-format string for the mode.
-        $candidates = $mode === PickerMode::DateTime
-            ? ['Y-m-d\TH:i:s', 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d']
-            : ['Y-m-d'];
+        $candidates = match ($mode) {
+            PickerMode::DateTime => ['Y-m-d\TH:i:s', 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d'],
+            PickerMode::Month => ['Y-m'],
+            default => ['Y-m-d'],
+        };
 
         foreach ($candidates as $format) {
+            $parseMode = match ($format) {
+                'Y-m' => PickerMode::Month,
+                'Y-m-d' => PickerMode::Date,
+                default => PickerMode::DateTime,
+            };
+
             try {
-                $parsed = $this->parser->parse(
-                    $value,
-                    $format,
-                    $format === 'Y-m-d' ? PickerMode::Date : PickerMode::DateTime,
-                );
+                $parsed = $this->parser->parse($value, $format, $parseMode);
 
                 return $parsed instanceof DateValue
                     ? DateTimeValue::fromDate($parsed)

@@ -1,4 +1,5 @@
 import { buildWeeks } from '../application/calendarGrid'
+import { buildMonths, isMonthDisabled } from '../application/monthGrid'
 import { buildTimeOptions } from '../application/timeOptions'
 import {
   addDays,
@@ -16,6 +17,7 @@ import type {
   CivilTime,
   DatepickerConfig,
   DayCell,
+  MonthCell,
   PickerValue,
   SelectionStatus,
   TimeOption,
@@ -43,6 +45,7 @@ export interface DatepickerComponent extends AlpineMagics {
   viewYear: number
   viewMonth: number
   focusedDate: CivilDate
+  focusedMonth: number
   selectedValue: PickerValue | null
   committedValue: PickerValue | null
   generation: number
@@ -53,6 +56,7 @@ export interface DatepickerComponent extends AlpineMagics {
   readonly value: string | null
   readonly hasValue: boolean
   readonly weeks: DayCell[][]
+  readonly monthCells: MonthCell[]
   readonly timeOptions: TimeOption[]
 
   // --- lifecycle ---
@@ -65,19 +69,25 @@ export interface DatepickerComponent extends AlpineMagics {
   toggle(): void
   previousMonth(): void
   nextMonth(): void
+  previousYear(): void
+  nextYear(): void
   selectDay(day: DayCell): void
   selectDate(date: CivilDate): void
+  selectMonth(year: number, month: number): void
   selectTime(option: TimeOption): void
   goToday(): void
   clear(): void
   onType(): void
   onInputKeydown(event: KeyboardEvent): void
   onGridKeydown(event: KeyboardEvent): void
+  onMonthGridKeydown(event: KeyboardEvent): void
   dayClass(day: DayCell): string
+  monthCellClass(cell: MonthCell): string
   timeClass(option: TimeOption): string
 
   // --- internal helpers ---
   commit(): void
+  emitChange(): void
   reconcile(model: string, sent: string | null): void
   syncFromServer(value: string | null): void
   onServerChange(value: unknown): void
@@ -106,6 +116,7 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
     viewYear: today.year,
     viewMonth: today.month,
     focusedDate: today,
+    focusedMonth: today.month,
     selectedValue: null,
     committedValue: null,
     generation: 0,
@@ -128,6 +139,17 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
         this.today,
         this.selectedDate(),
         this.focusedDate,
+        this.rule,
+      )
+    },
+
+    get monthCells(): MonthCell[] {
+      return buildMonths(
+        this.viewYear,
+        this.config.locale,
+        this.today,
+        this.selectedDate(),
+        this.focusedMonth,
         this.rule,
       )
     },
@@ -232,6 +254,14 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       this.viewMonth = next.month
     },
 
+    previousYear(): void {
+      this.viewYear -= 1
+    },
+
+    nextYear(): void {
+      this.viewYear += 1
+    },
+
     selectDay(day: DayCell): void {
       if (day.isDisabled) {
         return
@@ -260,6 +290,19 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       this.selectedValue = { date, time }
       this.updateDisplay()
       this.commit()
+    },
+
+    selectMonth(year: number, month: number): void {
+      if (isMonthDisabled(this.rule, year, month)) {
+        return
+      }
+
+      this.viewYear = year
+      this.focusedMonth = month
+      this.selectedValue = { date: { year, month, day: 1 }, time: null }
+      this.updateDisplay()
+      this.commit()
+      this.close(true)
     },
 
     selectTime(option: TimeOption): void {
@@ -297,6 +340,11 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
         this.selectedValue = { date: null, time }
         this.updateDisplay()
         this.commit()
+        return
+      }
+
+      if (this.config.mode === 'month') {
+        this.selectMonth(this.today.year, this.today.month)
         return
       }
 
@@ -388,6 +436,54 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       }
     },
 
+    onMonthGridKeydown(event: KeyboardEvent): void {
+      let handled = true
+
+      switch (event.key) {
+        case 'ArrowLeft':
+          this.focusedMonth -= 1
+          break
+        case 'ArrowRight':
+          this.focusedMonth += 1
+          break
+        case 'ArrowUp':
+          this.focusedMonth -= 3
+          break
+        case 'ArrowDown':
+          this.focusedMonth += 3
+          break
+        case 'PageUp':
+          this.viewYear -= 1
+          break
+        case 'PageDown':
+          this.viewYear += 1
+          break
+        case 'Enter':
+        case ' ':
+          this.selectMonth(this.viewYear, this.focusedMonth)
+          return
+        case 'Escape':
+          event.preventDefault()
+          this.close(true)
+          return
+        default:
+          handled = false
+      }
+
+      if (handled) {
+        event.preventDefault()
+        // Wrap across the year boundary so the grid is fully keyboard-navigable.
+        if (this.focusedMonth < 1) {
+          this.viewYear -= 1
+          this.focusedMonth += 12
+        } else if (this.focusedMonth > 12) {
+          this.viewYear += 1
+          this.focusedMonth -= 12
+        }
+        this.$nextTick?.(() => this.focusActive())
+      }
+    },
+
     dayClass(day: DayCell): string {
       const classes = this.config.classes
       const parts = [classes.day ?? '']
@@ -396,6 +492,15 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       if (day.isToday) parts.push(classes.day_today ?? '')
       if (day.isSelected) parts.push(classes.day_selected ?? '')
       if (day.isDisabled) parts.push(classes.day_disabled ?? '')
+      return parts.filter((part) => part !== '').join(' ')
+    },
+
+    monthCellClass(cell: MonthCell): string {
+      const classes = this.config.classes
+      const parts = [classes.month_cell ?? '']
+      if (cell.isToday) parts.push(classes.month_cell_today ?? '')
+      if (cell.isSelected) parts.push(classes.month_cell_selected ?? '')
+      if (cell.isDisabled) parts.push(classes.month_cell_disabled ?? '')
       return parts.filter((part) => part !== '').join(' ')
     },
 
@@ -414,6 +519,11 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       const model = this.config.wire.model
       const sent = this.valueString()
 
+      // Notify the outside world that the value changed, regardless of whether a
+      // wire:model is present. Fires once per commit (covers selectDate /
+      // selectTime / selectMonth / clear / onType / goToday).
+      this.emitChange()
+
       if (!this.bridge.isAvailable() || model === null) {
         this.committedValue = this.selectedValue
         this.status = 'committed'
@@ -431,6 +541,30 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
           }
           this.reconcile(model, sent)
         })
+    },
+
+    emitChange(): void {
+      const value = this.value
+      const display = this.display
+
+      // Native input/change on the hidden field so plain (non-Livewire) forms and
+      // native `change` listeners on a wrapping element see the change like any
+      // input — programmatic value assignment alone does not fire these.
+      const hidden = this.$refs?.hidden
+      if (hidden) {
+        hidden.dispatchEvent(new Event('input', { bubbles: true }))
+        hidden.dispatchEvent(new Event('change', { bubbles: true }))
+      }
+
+      // A namespaced event from the root carrying the formatted value and the
+      // display text, so consumers can react with x-on:datepicker:change /
+      // @datepicker:change without relying on wire:model.
+      this.$el?.dispatchEvent(
+        new CustomEvent('datepicker:change', {
+          detail: { value, display },
+          bubbles: true,
+        }),
+      )
     },
 
     reconcile(model: string, sent: string | null): void {
@@ -514,6 +648,7 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
       this.viewYear = base.year
       this.viewMonth = base.month
       this.focusedDate = base
+      this.focusedMonth = base.month
     },
 
     clampFocus(): void {
@@ -527,6 +662,14 @@ export function createDatepickerComponent(config: DatepickerConfig): DatepickerC
     focusActive(): void {
       const refs = this.$refs
       if (!refs) {
+        return
+      }
+
+      if (this.config.mode === 'month') {
+        const cell = refs.monthGrid?.querySelector<HTMLElement>(
+          `[data-month="${this.focusedMonth}"]`,
+        )
+        cell?.focus()
         return
       }
 

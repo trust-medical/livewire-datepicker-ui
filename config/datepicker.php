@@ -10,7 +10,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The picker mode used by <x-datepicker> when no `mode` prop is given.
-    | One of: "date", "time", "datetime".
+    | One of: "date", "time", "datetime", "month".
     |
     */
 
@@ -43,6 +43,10 @@ return [
             'display' => 'Y-m-d H:i',
             'display_12' => 'Y-m-d h:i A',
             'value' => 'Y-m-d\TH:i:s',
+        ],
+        'month' => [
+            'display' => 'Y-m',
+            'value' => 'Y-m',
         ],
     ],
 
@@ -175,6 +179,15 @@ return [
         'day_outside' => 'text-zinc-400 opacity-60 dark:text-zinc-600',
         'day_disabled' => 'pointer-events-none text-zinc-300 line-through opacity-50 dark:text-zinc-700',
         'day_weekend' => '',
+
+        // Month mode (year + month only). The 12 month cells reuse the day slots'
+        // look; the selected/today/disabled colours are driven by the same
+        // attribute variants so they win without `!important` (see day_selected).
+        'month_grid' => 'grid grid-cols-3 gap-1',
+        'month_cell' => 'flex h-11 items-center justify-center rounded-md text-sm font-normal text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
+        'month_cell_selected' => 'aria-selected:bg-zinc-900 aria-selected:text-zinc-50 aria-selected:hover:bg-zinc-900 aria-selected:hover:text-zinc-50 dark:aria-selected:bg-zinc-50 dark:aria-selected:text-zinc-900 dark:aria-selected:hover:bg-zinc-50 dark:aria-selected:hover:text-zinc-900',
+        'month_cell_today' => 'font-semibold ring-1 ring-inset ring-zinc-300 dark:ring-zinc-700',
+        'month_cell_disabled' => 'pointer-events-none text-zinc-300 line-through opacity-50 dark:text-zinc-700',
 
         'time_list' => 'mt-2 max-h-56 space-y-0.5 overflow-y-auto pr-1',
         'time_option' => 'flex min-h-11 w-full cursor-pointer items-center rounded-md px-3 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
