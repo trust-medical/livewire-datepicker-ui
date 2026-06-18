@@ -1,0 +1,59 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Label the untagged root package so Composer does not warn / default to '1.0.0'.
+# Only affects the root package's reported version, not dependency resolution.
+env:
+  COMPOSER_ROOT_VERSION: dev-main
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    name: Playwright (Livewire 4)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, dom, xml, fileinfo
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build assets
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E
+        run: pnpm exec playwright test
+        env:
+          CI: 'true'
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

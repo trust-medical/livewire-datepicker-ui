@@ -1,0 +1,31 @@
+# PHP / Composer
+/vendor
+composer.lock
+.phpunit.result.cache
+.phpunit.cache
+/build
+
+# Node / JS
+/node_modules
+/dist
+/coverage
+*.log
+/.pnpm-store
+
+# Playwright
+/playwright-report
+/test-results
+/.playwright
+
+# Testbench workbench skeleton (generated)
+/workbench/.env
+/workbench/build
+/vendor/orchestra
+
+# Editors / OS
+.idea
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+.phpactor.json

@@ -1,0 +1,39 @@
+{
+  "name": "livewire-datepicker-ui",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "node",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/php:1": {
+      "version": "8.3"
+    },
+    "ghcr.io/devcontainers/features/composer:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "open-southeners.laravel-pint",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-playwright.playwright",
+        "EditorConfig.EditorConfig",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[php]": {
+          "editor.defaultFormatter": "open-southeners.laravel-pint"
+        },
+        "intelephense.environment.phpVersion": "8.2.0",
+        "eslint.workingDirectories": [{ "mode": "auto" }]
+      }
+    }
+  },
+  "postCreateCommand": "composer install && pnpm install",
+  "remoteEnv": {
+    "PATH": "/app/vendor/bin:${containerEnv:PATH}"
+  }
+}

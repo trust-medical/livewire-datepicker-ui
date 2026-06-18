@@ -1,0 +1,122 @@
+[
+  {
+    "name": "iso date",
+    "mode": "date",
+    "format": "Y-m-d",
+    "value": { "year": 2026, "month": 6, "day": 18 },
+    "formatted": "2026-06-18",
+    "parseable": true
+  },
+  {
+    "name": "numeric month/day no padding",
+    "mode": "date",
+    "format": "n/j/Y",
+    "value": { "year": 2026, "month": 6, "day": 5 },
+    "formatted": "6/5/2026",
+    "parseable": true
+  },
+  {
+    "name": "european dotted",
+    "mode": "date",
+    "format": "d.m.Y",
+    "value": { "year": 2026, "month": 1, "day": 9 },
+    "formatted": "09.01.2026",
+    "parseable": true
+  },
+  {
+    "name": "two digit year",
+    "mode": "date",
+    "format": "d/m/y",
+    "value": { "year": 2026, "month": 6, "day": 18 },
+    "formatted": "18/06/26",
+    "parseable": true
+  },
+  {
+    "name": "textual month parseable",
+    "mode": "date",
+    "format": "F j, Y",
+    "value": { "year": 2026, "month": 6, "day": 18 },
+    "formatted": "June 18, 2026",
+    "parseable": true
+  },
+  {
+    "name": "short month parseable",
+    "mode": "date",
+    "format": "M j Y",
+    "value": { "year": 2026, "month": 12, "day": 1 },
+    "formatted": "Dec 1 2026",
+    "parseable": true
+  },
+  {
+    "name": "weekday display only",
+    "mode": "date",
+    "format": "l, F j, Y",
+    "value": { "year": 2026, "month": 6, "day": 18 },
+    "formatted": "Thursday, June 18, 2026",
+    "parseable": false
+  },
+  {
+    "name": "iso datetime with escaped T",
+    "mode": "datetime",
+    "format": "Y-m-d\\TH:i:s",
+    "value": { "year": 2026, "month": 6, "day": 18, "hour": 9, "minute": 30, "second": 15 },
+    "formatted": "2026-06-18T09:30:15",
+    "parseable": true
+  },
+  {
+    "name": "datetime minute precision",
+    "mode": "datetime",
+    "format": "Y-m-d H:i",
+    "value": { "year": 2026, "month": 6, "day": 18, "hour": 14, "minute": 5, "second": 0 },
+    "formatted": "2026-06-18 14:05",
+    "parseable": true
+  },
+  {
+    "name": "time 24h",
+    "mode": "time",
+    "format": "H:i",
+    "value": { "hour": 13, "minute": 5, "second": 0 },
+    "formatted": "13:05",
+    "parseable": true
+  },
+  {
+    "name": "time 24h with seconds",
+    "mode": "time",
+    "format": "H:i:s",
+    "value": { "hour": 23, "minute": 59, "second": 7 },
+    "formatted": "23:59:07",
+    "parseable": true
+  },
+  {
+    "name": "time 12h pm",
+    "mode": "time",
+    "format": "h:i A",
+    "value": { "hour": 13, "minute": 5, "second": 0 },
+    "formatted": "01:05 PM",
+    "parseable": true
+  },
+  {
+    "name": "time 12h midnight",
+    "mode": "time",
+    "format": "g:i a",
+    "value": { "hour": 0, "minute": 0, "second": 0 },
+    "formatted": "12:00 am",
+    "parseable": true
+  },
+  {
+    "name": "time 12h noon",
+    "mode": "time",
+    "format": "g:i a",
+    "value": { "hour": 12, "minute": 30, "second": 0 },
+    "formatted": "12:30 pm",
+    "parseable": true
+  },
+  {
+    "name": "japanese literals",
+    "mode": "date",
+    "format": "Y年n月j日",
+    "value": { "year": 2026, "month": 6, "day": 18 },
+    "formatted": "2026年6月18日",
+    "parseable": true
+  }
+]

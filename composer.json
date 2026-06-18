@@ -1,0 +1,92 @@
+{
+    "name": "trust-medical/livewire-datepicker-ui",
+    "description": "A lightweight, dependency-free date / time / datetime picker UI for Laravel & Livewire with optimistic UI updates, full keyboard accessibility and Tailwind-first theming.",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "alpinejs",
+        "datepicker",
+        "timepicker",
+        "datetimepicker",
+        "tailwindcss",
+        "ui",
+        "accessibility"
+    ],
+    "homepage": "https://github.com/trust-medical/livewire-datepicker-ui",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Trust Medical",
+            "email": "fukuhara@trust-medical.jp"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/view": "^11.0 || ^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "livewire/livewire": "^3.5 || ^4.0",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^9.5 || ^10.0 || ^11.0",
+        "pestphp/pest": "^3.5",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0"
+    },
+    "suggest": {
+        "livewire/livewire": "Required for the optimistic Livewire binding (`wire:model`). The package also works with plain Blade forms when Alpine.js is present.",
+        "alpinejs": "The JavaScript runtime the picker is built on. Livewire bundles Alpine automatically; load it separately for non-Livewire usage."
+    },
+    "autoload": {
+        "psr-4": {
+            "TrustMedical\\LivewireDatepickerUi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TrustMedical\\LivewireDatepickerUi\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "test": "@php vendor/bin/pest",
+        "test:coverage": "@php vendor/bin/pest --coverage",
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=1G",
+        "format": "@php vendor/bin/pint",
+        "lint": "@php vendor/bin/pint --test"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TrustMedical\\LivewireDatepickerUi\\Infrastructure\\Laravel\\DatepickerServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

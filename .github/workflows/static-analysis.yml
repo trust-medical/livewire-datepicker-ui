@@ -1,0 +1,61 @@
+name: static-analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Label the untagged root package so Composer does not warn / default to '1.0.0'.
+# Only affects the root package's reported version, not dependency resolution.
+env:
+  COMPOSER_ROOT_VERSION: dev-main
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    name: Pint + Larastan
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, dom, xml, fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Pint (code style)
+        run: vendor/bin/pint --test
+
+      - name: Larastan (static analysis)
+        run: composer analyse
+
+  js:
+    runs-on: ubuntu-latest
+    name: ESLint + Prettier + tsc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: Prettier
+        run: pnpm format:check
+
+      - name: Type-check
+        run: pnpm typecheck

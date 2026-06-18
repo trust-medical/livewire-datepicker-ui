@@ -1,0 +1,51 @@
+name: tests-php
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Label the untagged root package so Composer does not warn / default to '1.0.0'.
+# This is purely cosmetic for the root package and does not influence the
+# Laravel/Livewire versions injected into the matrix via `composer require`.
+env:
+  COMPOSER_ROOT_VERSION: dev-main
+
+jobs:
+  pest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.2', testbench: '^9.5', livewire: '^3.5', label: 'L11 / LW3' }
+          - { php: '8.3', testbench: '^9.5', livewire: '^3.5', label: 'L11 / LW3' }
+          - { php: '8.3', testbench: '^10.0', livewire: '^3.5', label: 'L12 / LW3' }
+          - { php: '8.3', testbench: '^10.0', livewire: '^4.0', label: 'L12 / LW4' }
+          - { php: '8.4', testbench: '^10.0', livewire: '^4.0', label: 'L12 / LW4' }
+          - { php: '8.3', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4', experimental: true }
+          - { php: '8.4', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4', experimental: true }
+
+    name: PHP ${{ matrix.php }} · ${{ matrix.label }}
+    continue-on-error: ${{ matrix.experimental || false }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, intl, dom, xml, fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require \
+            "orchestra/testbench:${{ matrix.testbench }}" \
+            "livewire/livewire:${{ matrix.livewire }}" \
+            --dev --no-interaction --no-update
+          composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run Pest
+        run: vendor/bin/pest --colors=always

@@ -1,0 +1,19 @@
+/*
+ * Tailwind CSS v4 stylesheet for the Testbench workbench app.
+ *
+ * It compiles the exact utility classes the datepicker emits so `make serve`
+ * and `make screenshots` render the real default styling. The @source globs
+ * point Tailwind at the package's class map (config) and Blade templates plus
+ * the workbench views — without them v4 would tree-shake the classes away.
+ *
+ * This is also the canonical example for consumers: see the "Styling" section
+ * of the README for the equivalent @source / @custom-variant setup.
+ */
+@import "tailwindcss";
+
+/* Class-based dark mode (the workbench toggles `<html class="dark">`). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "../../../config/datepicker.php";
+@source "../../../resources/views/**/*.blade.php";
+@source "../views/**/*.blade.php";

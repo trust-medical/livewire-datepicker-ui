@@ -1,0 +1,52 @@
+# Minimal two-service development environment for package work.
+# - php:  Composer, Pest, Larastan, Pint, Testbench dev server
+# - node: pnpm, Vite, Vitest, tsc, ESLint, Playwright
+# No MySQL/Redis/Mailhog: the package has no runtime services.
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    working_dir: /app
+    volumes:
+      - .:/app
+      - composer-cache:/home/app/.composer
+    ports:
+      # Testbench dev server (also the Playwright E2E target).
+      - '${E2E_PORT:-8000}:8000'
+    environment:
+      COMPOSER_MEMORY_LIMIT: '-1'
+      # The package version is derived from Git tags on release; while developing
+      # the untagged main branch, tell Composer the root version explicitly so it
+      # does not warn and default to '1.0.0'. This only labels the root package
+      # and never affects dependency resolution.
+      COMPOSER_ROOT_VERSION: 'dev-main'
+    tty: true
+    stdin_open: true
+
+  node:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pnpm-store:/home/pwuser/.local/share/pnpm
+    environment:
+      # Point Playwright at the workbench server when running E2E across
+      # containers. The server is started separately with `make serve`, which
+      # publishes the `php` network alias (via --use-aliases) so this hostname
+      # resolves to it. No `depends_on: php` here on purpose: node tasks
+      # (test-js / build / e2e) must not spin up a second, non-serving php
+      # container — that would clash with `make serve` on host port 8000.
+      E2E_EXTERNAL: '1'
+      E2E_BASE_URL: 'http://php:8000'
+    tty: true
+    stdin_open: true
+
+volumes:
+  composer-cache:
+  pnpm-store:

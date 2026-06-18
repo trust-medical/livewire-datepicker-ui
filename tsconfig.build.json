@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationDir": "./dist",
+    "rootDir": "./resources/js/datepicker"
+  },
+  "include": ["resources/js/datepicker/**/*.ts"],
+  "exclude": ["node_modules", "dist", "vendor", "workbench", "tests"]
+}

@@ -1,0 +1,15 @@
+/*
+ * The picker's visual design lives entirely in the (fully overridable) Tailwind
+ * class map, so this file ships only the one rule that neither Tailwind nor
+ * Alpine provides on its own:
+ *
+ * Alpine's `x-cloak` directive does NOT inject any CSS — by design you must
+ * define this rule yourself, otherwise the popover flashes visible for a frame
+ * before Alpine initialises (FOUC). It is shipped here (and via @datepickerStyles
+ * / the npm "./css" export) so consumers get correct behaviour out of the box.
+ *
+ * Everything else — including the live region's `sr-only` — comes from Tailwind.
+ */
+[x-cloak] {
+  display: none !important;
+}

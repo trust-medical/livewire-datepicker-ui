@@ -1,0 +1,15 @@
+.git
+.github
+vendor
+node_modules
+dist
+coverage
+build
+playwright-report
+test-results
+.phpunit.cache
+.phpunit.result.cache
+*.log
+.DS_Store
+.idea
+.vscode
