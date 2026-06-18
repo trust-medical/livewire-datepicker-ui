@@ -50,6 +50,24 @@ make install
 - **Keep the public surface small.** Avoid adding new public exports/props
   unless necessary; prefer composition over new API.
 
+## CI matrix & dependency policy
+
+`tests-php` runs the suite across Laravel 11 / 12 / 13 (PHP 8.2–8.4) by
+`composer require`-ing the matching Testbench + Livewire versions. Two notes for
+maintainers:
+
+- **Pest 3 _and_ 4.** `pestphp/pest` is constrained to `^3.5 || ^4.0` because
+  Pest 4 (via `pest-plugin-laravel ^4`) is the only line that supports Laravel
+  13, while Pest 4 requires PHP 8.3+. Composer therefore resolves Pest 4 on
+  PHP 8.3+ and falls back to Pest 3 on the PHP 8.2 / Laravel 11 row.
+- **`config.policy.advisories.block: false`.** Composer 2.10 blocks installing
+  package versions with open security advisories during `update`. Older but
+  still-supported Laravel 11 releases carry framework advisories we cannot fix
+  from a library, which would otherwise break the Laravel 11 CI rows. Disabling
+  the _block_ (advisories are still **reported**, not hidden) lets the matrix
+  install Laravel 11 for testing. It lives under `config`, so it only applies
+  when this repo is the Composer root — consumers never inherit it.
+
 ## Regenerating the README screenshots
 
 The images under `docs/images/` are generated from the workbench `/showcase`

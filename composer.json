@@ -33,8 +33,8 @@
         "livewire/livewire": "^3.5 || ^4.0",
         "mockery/mockery": "^1.6",
         "orchestra/testbench": "^9.5 || ^10.0 || ^11.0",
-        "pestphp/pest": "^3.5",
-        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest": "^3.5 || ^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0 || ^4.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0"
     },
@@ -78,6 +78,11 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "phpstan/extension-installer": true
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
         }
     },
     "extra": {

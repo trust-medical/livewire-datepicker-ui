@@ -23,14 +23,13 @@ jobs:
           - { php: '8.3', testbench: '^10.0', livewire: '^3.5', label: 'L12 / LW3' }
           - { php: '8.3', testbench: '^10.0', livewire: '^4.0', label: 'L12 / LW4' }
           - { php: '8.4', testbench: '^10.0', livewire: '^4.0', label: 'L12 / LW4' }
-          - { php: '8.3', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4', experimental: true }
-          - { php: '8.4', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4', experimental: true }
+          - { php: '8.3', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4' }
+          - { php: '8.4', testbench: '^11.0', livewire: '^4.0', label: 'L13 / LW4' }
 
     name: PHP ${{ matrix.php }} · ${{ matrix.label }}
-    continue-on-error: ${{ matrix.experimental || false }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
