@@ -17,7 +17,7 @@ use TrustMedical\LivewireDatepickerUi\Domain\ValueObjects\TimeValue;
 function fixtureValue(PickerMode $mode, array $components): DateValue|TimeValue|DateTimeValue
 {
     return match ($mode) {
-        PickerMode::Date => new DateValue($components['year'], $components['month'], $components['day']),
+        PickerMode::Date, PickerMode::Month => new DateValue($components['year'], $components['month'], $components['day']),
         PickerMode::Time => new TimeValue($components['hour'], $components['minute'], $components['second'] ?? 0),
         PickerMode::DateTime => DateTimeValue::fromComponents(
             $components['year'],

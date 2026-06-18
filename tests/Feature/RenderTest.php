@@ -34,6 +34,23 @@ it('renders both grid and listbox in datetime mode', function () {
         ->assertSee('role="listbox"', false);
 });
 
+it('renders a month grid (no day grid or time list) in month mode', function () {
+    $this->blade('<x-month-picker name="invoice_month" />')
+        ->assertSee('data-mode="month"', false)
+        ->assertSee('role="grid"', false)
+        ->assertSee('x-ref="monthGrid"', false)
+        ->assertSee('selectMonth(', false)
+        ->assertSee('onMonthGridKeydown(', false)
+        ->assertDontSee('role="listbox"', false)
+        ->assertDontSee('selectDay(', false);
+});
+
+it('seeds a month value as Y-m in the hidden input', function () {
+    $this->blade('<x-month-picker name="m" value="2026-06-18" />')
+        ->assertSee('data-mode="month"', false)
+        ->assertSee('value="2026-06"', false);
+});
+
 it('reflects custom classes from the prop', function () {
     $this->blade('<x-date-picker :classes="[\'day_selected\' => \'bg-emerald-500\']" />')
         ->assertSee('bg-emerald-500', false);

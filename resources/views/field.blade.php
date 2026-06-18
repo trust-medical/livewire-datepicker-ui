@@ -8,8 +8,9 @@
     $fieldId = $dp['fieldId'];
     $inputId = $fieldId.'-input';
     $panelId = $fieldId.'-panel';
+    $isMonth = $config->mode->value === 'month';
     $hasCalendar = $config->mode->value !== 'time';
-    $hasTime = $config->mode->value !== 'date';
+    $hasTime = $config->mode->hasTime();
     // The consumer's `class` styles the (otherwise unstyled) input, so merge it
     // onto the input slot here and strip it from the root attribute bag below.
     $inputClass = trim(($classes['input'] ?? '').' '.($attributes->get('class') ?? ''));
@@ -102,7 +103,47 @@
             class="{{ $classes['popover_inline'] ?? '' }}"
         @endunless
     >
-        @if ($hasCalendar)
+        @if ($hasCalendar && $isMonth)
+            {{-- Month mode: year navigation + a 12-month grid (no day grid). --}}
+            <div class="{{ $classes['header'] ?? '' }}">
+                <button type="button" x-on:click="previousYear()" aria-label="{{ $labels['previousYear'] ?? '' }}" class="{{ $classes['nav_button'] ?? '' }}">
+                    <span aria-hidden="true">&lsaquo;</span>
+                </button>
+
+                <div class="{{ $classes['title'] ?? '' }}">
+                    <label class="sr-only" for="{{ $fieldId }}-year">{{ $labels['yearSelect'] ?? '' }}</label>
+                    <select id="{{ $fieldId }}-year" :value="viewYear" x-on:change="viewYear = parseInt($event.target.value, 10)" class="{{ $classes['year_select'] ?? '' }}">
+                        @foreach ($dp['years'] as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button type="button" x-on:click="nextYear()" aria-label="{{ $labels['nextYear'] ?? '' }}" class="{{ $classes['nav_button'] ?? '' }}">
+                    <span aria-hidden="true">&rsaquo;</span>
+                </button>
+            </div>
+
+            <div role="grid" aria-labelledby="{{ $fieldId }}-year" x-ref="monthGrid" x-on:keydown="onMonthGridKeydown($event)" class="{{ $classes['month_grid'] ?? '' }}">
+                <template x-for="cell in monthCells" :key="cell.month">
+                    <button
+                        type="button"
+                        role="gridcell"
+                        :data-month="cell.month"
+                        :tabindex="cell.isFocused ? 0 : -1"
+                        :aria-selected="cell.isSelected ? 'true' : 'false'"
+                        :aria-disabled="cell.isDisabled ? 'true' : 'false'"
+                        :aria-current="cell.isToday ? 'date' : null"
+                        :data-selected="cell.isSelected ? true : null"
+                        :data-today="cell.isToday ? true : null"
+                        :data-disabled="cell.isDisabled ? true : null"
+                        x-on:click="selectMonth(cell.year, cell.month)"
+                        :class="monthCellClass(cell)"
+                        x-text="cell.label"
+                    ></button>
+                </template>
+            </div>
+        @elseif ($hasCalendar)
             <div class="{{ $classes['header'] ?? '' }}">
                 <button type="button" x-on:click="previousMonth()" aria-label="{{ $labels['previousMonth'] ?? '' }}" class="{{ $classes['nav_button'] ?? '' }}">
                     <span aria-hidden="true">&lsaquo;</span>

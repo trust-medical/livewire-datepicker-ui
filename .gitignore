@@ -6,8 +6,10 @@ composer.lock
 /build
 
 # Node / JS
+# NOTE: /dist is intentionally NOT ignored — the prebuilt assets are committed and
+# shipped so `composer require` (Option A: vendor:publish --tag=datepicker-assets)
+# works without a separate build step. A CI drift guard keeps them in sync with src.
 /node_modules
-/dist
 /coverage
 *.log
 /.pnpm-store

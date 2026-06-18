@@ -107,14 +107,16 @@ function build(
   let time: CivilTime | null = null
 
   if (mode !== 'time') {
-    const built = buildDate(captures, locale)
+    // Month formats (e.g. "Y-m") carry no day token, so default the day to the
+    // 1st — a month value is represented as a date on day 1.
+    const built = buildDate(captures, locale, mode === 'month')
     if (built === null) {
       return { ok: false, error: 'invalid_date' }
     }
     date = built
   }
 
-  if (mode !== 'date') {
+  if (mode === 'time' || mode === 'datetime') {
     const built = buildTime(captures)
     if (built === null) {
       return { ok: false, error: 'invalid_time' }
@@ -125,10 +127,14 @@ function build(
   return { ok: true, value: { date, time } }
 }
 
-function buildDate(captures: Record<string, string>, locale: LocaleData): CivilDate | null {
+function buildDate(
+  captures: Record<string, string>,
+  locale: LocaleData,
+  defaultDay = false,
+): CivilDate | null {
   const year = resolveYear(captures)
   const month = resolveMonth(captures, locale)
-  const day = resolveDay(captures)
+  const day = resolveDay(captures) ?? (defaultDay ? 1 : null)
 
   if (year === null || month === null || day === null) {
     return null

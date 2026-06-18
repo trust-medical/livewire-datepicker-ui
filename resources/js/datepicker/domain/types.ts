@@ -18,7 +18,7 @@ export interface PickerValue {
   time: CivilTime | null
 }
 
-export type PickerMode = 'date' | 'time' | 'datetime'
+export type PickerMode = 'date' | 'time' | 'datetime' | 'month'
 
 export type SelectionStatus = 'idle' | 'pending' | 'committed' | 'rejected' | 'invalid'
 
@@ -91,6 +91,17 @@ export interface DayCell {
   isDisabled: boolean
   isSelected: boolean
   isWeekend: boolean
+  isFocused: boolean
+}
+
+/** One rendered cell in the month-mode grid (year + month only). */
+export interface MonthCell {
+  year: number
+  month: number // 1-12
+  label: string
+  isToday: boolean
+  isSelected: boolean
+  isDisabled: boolean
   isFocused: boolean
 }
 

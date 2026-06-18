@@ -48,7 +48,7 @@ These images are generated, not hand-made — regenerate them any time with
 - [Publishing config, views, translations & assets](#publishing)
 - [Tailwind setup](#tailwind-setup)
 - [Basic usage](#basic-usage)
-- [Modes: date / time / datetime](#modes)
+- [Modes: date / time / datetime / month](#modes)
 - [Formats](#formats)
 - [Constraints: min / max / disabled](#constraints)
 - [Localization](#localization)
@@ -70,8 +70,8 @@ These images are generated, not hand-made — regenerate them any time with
 
 ## Features
 
-- **Three pickers** — `<x-date-picker>`, `<x-time-picker>`, `<x-date-time-picker>`
-  (plus the generic `<x-datepicker mode="…">`).
+- **Four pickers** — `<x-date-picker>`, `<x-time-picker>`, `<x-date-time-picker>`,
+  `<x-month-picker>` (plus the generic `<x-datepicker mode="…">`).
 - **Separate display and submit formats** (`display-format` vs `value-format`).
 - **Optimistic Livewire binding** with automatic rollback on server rejection and
   an `invalid` state on validation errors.
@@ -139,6 +139,26 @@ Playwright and the recommended extensions in one container, and runs
 composer require trust-medical/livewire-datepicker-ui
 ```
 
+> **Not on Packagist yet.** Until the package is published to Packagist, point
+> Composer at the repository directly by adding a `repositories` entry to your
+> app's `composer.json`, then require a tagged release:
+>
+> ```jsonc
+> {
+>   "repositories": [
+>     { "type": "vcs", "url": "https://github.com/trust-medical/livewire-datepicker-ui" }
+>   ],
+>   "require": {
+>     "trust-medical/livewire-datepicker-ui": "^0.1"
+>   }
+> }
+> ```
+>
+> The prebuilt assets in `dist/` are committed and shipped with every tag, so
+> `vendor:publish --tag=datepicker-assets` (Option A) works straight after
+> `composer update` — no Node build step on your side. Once the package is on
+> Packagist the plain `composer require` line above is all you need.
+
 The service provider is auto-discovered. You now have two ways to load the
 JavaScript.
 
@@ -158,6 +178,13 @@ php artisan vendor:publish --tag=datepicker-assets
 
 `@datepickerScripts` loads a global build that registers itself against the
 Alpine instance Livewire ships. Place it **before** `@livewireScripts`.
+
+> **Required: Tailwind `@source`.** Option A ships the JavaScript and the FOUC
+> guard (`[x-cloak]`), but **not** the picker's visual styles — those are Tailwind
+> utility classes that your app's Tailwind build must generate. `@datepickerStyles`
+> alone leaves the picker unstyled. You **must** also add the `@source` directives
+> from [Tailwind setup](#tailwind-setup) below, otherwise the calendar renders with
+> no colours, spacing or sizing.
 
 ### Option B — import from npm (bundler users)
 
@@ -201,6 +228,11 @@ prebuilt JS/CSS stays in sync.
 ---
 
 ## Tailwind setup
+
+> **This step is required for both Option A and Option B.** The picker's entire
+> visual design lives in Tailwind utility classes (the class map in
+> `config/datepicker.php`), so without the `@source` directives below the picker
+> renders unstyled regardless of how you loaded the JavaScript.
 
 The default class map is built for **Tailwind CSS v4** with the **zinc** palette
 (a shadcn/ui-inspired look) and interactive controls sized to a **44×44px touch
@@ -269,20 +301,43 @@ Works without Livewire too (plain form submit), as long as Alpine is on the page
 </form>
 ```
 
+### Change events (with or without `wire:model`)
+
+Every value change (select, clear, type) dispatches DOM events from the picker —
+regardless of whether a `wire:model` is bound — so you can integrate without
+Livewire:
+
+- A **native `input` + `change`** on the hidden field, bubbling up the tree, so
+  native listeners and plain forms see the change like any input.
+- A **`datepicker:change`** `CustomEvent` from the root element carrying
+  `detail: { value, display }` (the submit-format value and the display text).
+
+```blade
+{{-- React to the picker from the outside, no wire:model required --}}
+<div x-data x-on:datepicker:change="console.log($event.detail.value, $event.detail.display)">
+    <x-date-picker name="dob" />
+</div>
+```
+
 ---
 
 <a name="modes"></a>
 
-## Modes: date / time / datetime
+## Modes: date / time / datetime / month
 
 ```blade
-<x-date-picker      wire:model="day" />          {{-- calendar only --}}
-<x-time-picker      wire:model="time" />         {{-- time list only --}}
-<x-date-time-picker wire:model="moment" />       {{-- calendar + time list --}}
+<x-date-picker      wire:model="day" />            {{-- calendar only --}}
+<x-time-picker      wire:model="time" />           {{-- time list only --}}
+<x-date-time-picker wire:model="moment" />         {{-- calendar + time list --}}
+<x-month-picker     wire:model="invoice_month" />  {{-- year + month only --}}
 
 {{-- or the generic tag --}}
 <x-datepicker mode="datetime" wire:model="moment" />
 ```
+
+`month` selects a year + month only (the HTML `type="month"` equivalent): a 12-month
+grid with year navigation, no day grid. Its default format is `Y-m`, and the bound /
+submitted value is the month's first day (e.g. `2026-06`).
 
 ---
 
@@ -576,7 +631,7 @@ own code is responsible for interpreting.
 | `name` / `id`        | string          | field name / DOM id                              |
 | `wire:model[.*]`     | —               | Livewire binding (`.live`, `.blur`, `.defer`)    |
 | `value`              | string/Carbon   | initial value                                    |
-| `mode`               | date/time/datetime |                                               |
+| `mode`               | date/time/datetime/month |                                         |
 | `display-format`     | string          | PHP date tokens shown in the input               |
 | `value-format`       | string          | PHP date tokens submitted/bound                  |
 | `locale`             | string          | locale code (default: app locale)                |

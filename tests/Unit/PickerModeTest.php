@@ -8,7 +8,8 @@ use TrustMedical\LivewireDatepickerUi\Domain\Exceptions\InvalidConfigurationExce
 it('parses from a string case-insensitively', function () {
     expect(PickerMode::fromString('date'))->toBe(PickerMode::Date)
         ->and(PickerMode::fromString('TIME'))->toBe(PickerMode::Time)
-        ->and(PickerMode::fromString(' DateTime '))->toBe(PickerMode::DateTime);
+        ->and(PickerMode::fromString(' DateTime '))->toBe(PickerMode::DateTime)
+        ->and(PickerMode::fromString('Month'))->toBe(PickerMode::Month);
 });
 
 it('reports date and time capability', function () {
@@ -17,7 +18,16 @@ it('reports date and time capability', function () {
         ->and(PickerMode::Time->hasDate())->toBeFalse()
         ->and(PickerMode::Time->hasTime())->toBeTrue()
         ->and(PickerMode::DateTime->hasDate())->toBeTrue()
-        ->and(PickerMode::DateTime->hasTime())->toBeTrue();
+        ->and(PickerMode::DateTime->hasTime())->toBeTrue()
+        ->and(PickerMode::Month->hasDate())->toBeTrue()
+        ->and(PickerMode::Month->hasTime())->toBeFalse();
+});
+
+it('reports month capability', function () {
+    expect(PickerMode::Month->isMonth())->toBeTrue()
+        ->and(PickerMode::Date->isMonth())->toBeFalse()
+        ->and(PickerMode::DateTime->isMonth())->toBeFalse()
+        ->and(PickerMode::Time->isMonth())->toBeFalse();
 });
 
 it('throws on an unknown mode', function () {
