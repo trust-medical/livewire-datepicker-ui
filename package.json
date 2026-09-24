@@ -1,6 +1,6 @@
 {
   "name": "@trust-medical/livewire-datepicker-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A lightweight, dependency-free date / time / datetime picker built on Alpine.js for Laravel & Livewire.",
   "license": "MIT",
   "type": "module",
