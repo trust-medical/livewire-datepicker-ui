@@ -164,10 +164,18 @@ return [
 
         'grid' => 'w-full border-collapse',
         'weekday_row' => 'grid grid-cols-7 justify-items-center',
-        'weekday' => 'flex h-8 w-11 items-center justify-center text-[0.8rem] font-normal text-zinc-500 dark:text-zinc-400',
-        'week' => 'mt-1 grid grid-cols-7 justify-items-center',
+        // Not a touch target (no click handler), so it's free to be shorter than
+        // the 44px day cells below it; h-6 keeps the header compact.
+        'weekday' => 'flex h-6 w-11 items-center justify-center text-[0.8rem] font-normal text-zinc-500 dark:text-zinc-400',
+        // No vertical margin between weeks by design (a dense, table-like grid).
+        // `hover`/`focus-within` light up the whole row when any day button in it
+        // is hovered or focused — CSS :hover/:focus-within bubble from the button
+        // to this row div natively, so no JS/Alpine state is needed.
+        'week' => 'grid grid-cols-7 justify-items-center rounded-md transition-colors hover:bg-zinc-50 focus-within:bg-zinc-50 dark:hover:bg-zinc-900 dark:focus-within:bg-zinc-900',
         // 44x44 touch target (size-11). day_today uses a ring (no background) so
-        // it composes with day_selected's fill instead of fighting it.
+        // it composes with day_selected's fill instead of fighting it. The
+        // button's own hover is a stronger shade than the row's, so the hovered
+        // cell still stands out within its highlighted row.
         'day' => 'flex size-11 items-center justify-center rounded-md text-sm font-normal text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
         // The inverted fill/text are applied through the `aria-selected` attribute
         // variant (the day button always carries aria-selected="true|false"). An

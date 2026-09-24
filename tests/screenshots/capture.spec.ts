@@ -14,7 +14,7 @@ import { expect, test } from '@playwright/test'
 const INPUT = '#showcase-input'
 const PANEL = '#showcase-panel'
 
-type Shot = { name: string; url: string }
+type Shot = { name: string; url: string; hover?: boolean }
 
 const shots: Shot[] = [
   { name: 'date-light', url: '/showcase?mode=date' },
@@ -24,6 +24,10 @@ const shots: Shot[] = [
   // Japanese-localized UI (?lang=ja): weekday/month names + footer buttons.
   { name: 'date-ja-light', url: '/showcase?mode=date&lang=ja' },
   { name: 'datetime-ja-light', url: '/showcase?mode=datetime&lang=ja' },
+  // Demonstrates the whole-week-row hover highlight (see `week` in
+  // config/datepicker.php). Hovers a day a few rows in so the shot always
+  // lands on an in-month week regardless of which weekday the 1st falls on.
+  { name: 'date-hover-light', url: '/showcase?mode=date', hover: true },
 ]
 
 for (const shot of shots) {
@@ -57,6 +61,12 @@ for (const shot of shots) {
     const y = Math.max(0, Math.min(input.y, panel.y) - pad)
     const right = Math.max(input.x + input.width, panel.x + panel.width) + pad
     const bottom = Math.max(input.y + input.height, panel.y + panel.height) + pad
+
+    if (shot.hover) {
+      // Third grid row, a middle column: reliably an in-month day regardless
+      // of which weekday the 1st of the current month falls on.
+      await page.locator(`${PANEL} [role="row"]`).nth(2).locator('button[data-date]').nth(3).hover()
+    }
 
     await page.screenshot({
       path: `docs/images/datepicker-${shot.name}.png`,

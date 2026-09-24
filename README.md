@@ -22,6 +22,13 @@ customisable (see [Styling & theming](#styling--theming)).
 | :----------: | :---------: |
 | ![Date picker — light](docs/images/datepicker-date-light.png) | ![Date picker — dark](docs/images/datepicker-date-dark.png) |
 
+Hovering any day highlights its whole week row (the `week` slot), so scanning a
+row is easier at a glance; the hovered day itself stays a shade darker:
+
+| Date (hover) |
+| :-----------: |
+| ![Date picker — week row hover](docs/images/datepicker-date-hover-light.png) |
+
 | Time | Datetime |
 | :--: | :------: |
 | ![Time picker](docs/images/datepicker-time-light.png) | ![Datetime picker](docs/images/datepicker-datetime-light.png) |
@@ -435,7 +442,9 @@ The defaults target **Tailwind v4** and use the **zinc** palette
 (shadcn-inspired). The popover controls (days, nav, time options, footer) are
 sized to a **44×44px touch target**. `day_today` is rendered as a ring (no
 background) so it composes cleanly with the filled `day_selected` state instead
-of fighting it.
+of fighting it. Hovering or keyboard-focusing any day highlights its whole week
+row via the `week` slot (`hover:`/`focus-within:` — no JS involved, since a
+child's `:hover`/`:focus-within` naturally applies to its ancestor row too).
 
 The **text input** keeps deliberately **minimal** default styling — a height,
 border, rounded corners and padding — so it is usable out of the box yet easy to
