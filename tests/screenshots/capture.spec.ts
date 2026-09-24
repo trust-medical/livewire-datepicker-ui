@@ -65,7 +65,12 @@ for (const shot of shots) {
     if (shot.hover) {
       // Third grid row, a middle column: reliably an in-month day regardless
       // of which weekday the 1st of the current month falls on.
-      await page.locator(`${PANEL} [role="row"]`).nth(2).locator('button[data-date]').nth(3).hover()
+      const row = page.locator(`${PANEL} [role="row"]`).nth(2)
+      await row.locator('button[data-date]').nth(3).hover()
+      // `week`/`day` fade in their hover background via `transition-colors`;
+      // wait for it to settle so the shot doesn't catch a mid-transition blend
+      // (Tailwind v4's zinc-100 resolves to this oklch(), not an rgb() value).
+      await expect(row).toHaveCSS('background-color', 'oklch(0.967 0.001 286.375)')
     }
 
     await page.screenshot({
